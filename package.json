@@ -49,5 +49,8 @@
 		"promise": {
 			"prefer-await-to-then": false
 		}
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

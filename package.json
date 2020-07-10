@@ -1,6 +1,6 @@
 {
 	"name": "@aventyret/swagger-cli",
-	"version": "0.9.0",
+	"version": "1.0.0",
 	"description": "My awesome command-line tool",
 	"license": "MIT",
 	"repository": "Aventyret/swagger-cli",

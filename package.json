@@ -1,7 +1,7 @@
 {
 	"name": "@aventyret/swagger-cli",
 	"version": "1.1.0",
-	"description": "My awesome command-line tool",
+	"description": "A cli for working with swagger defined apis.",
 	"license": "MIT",
 	"repository": "Aventyret/swagger-cli",
 	"author": {

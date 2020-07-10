@@ -10,7 +10,7 @@
 		"url": "http://github.com/Aventyret/swagger-cli"
 	},
 	"bin": {
-		"swagger-cli": "cli.js"
+		"swagger-cli": "src/cli.js"
 	},
 	"engines": {
 		"node": ">=12"
@@ -19,7 +19,7 @@
 		"test": "xo && ava"
 	},
 	"files": [
-		"cli.js"
+		"src/cli.js"
 	],
 	"keywords": [
 		"cli",

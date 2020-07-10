@@ -74,7 +74,7 @@ const handler = (token, rc, method, command) => parameters => {
 			.then(response => {
 				if (!response.ok) {
 					console.log(response.status);
-					console.log(uri, parameters);
+					console.log(url);
 					if (response.status === 401) {
 						return response.text().then(() => Promise.reject({status: response.status, message: 'Unauthorized'}));
 					}

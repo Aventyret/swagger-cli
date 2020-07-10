@@ -5,7 +5,7 @@ promise/no-return-wrap: "off",
 camelcase: "off",
 unicorn/no-fn-reference-in-iterator: "off"
 */
-const to_parts = name => name.split('/').slice(2);
+const to_parts = name => name.split('/').slice(1);
 const to_cmd = name => to_parts(name).join('/');
 const to_title = name => to_parts(name).reverse().join(' ');
 const to_alias = name => name[0];
@@ -81,8 +81,13 @@ const map_put = def => {
 const map_get = def => {
 	const parameters = dig(def, 'parameters') || [];
 	return parameters
-		.map(({name, schema: {type, format}}) =>
-			({
+		.map(({name, schema, type, format}) => {
+			if (schema) {
+				type = schema.type;
+				format = schema.format;
+			}
+
+			return {
 				name,
 				type,
 				format,
@@ -90,7 +95,8 @@ const map_get = def => {
 				alias: to_alias(name),
 				title: to_title(name),
 				description: to_title(name)
-			})
+			};
+		}
 		);
 };
 

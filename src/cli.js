@@ -62,7 +62,7 @@ const login = argv => {
 const token = argv => {
 	login(argv)
 		.then(token => {
-			console.log(token);
+			console.info(token);
 		});
 };
 
@@ -81,6 +81,12 @@ yargs.option('verbose', {
 	description: 'Enable verbose output'
 });
 
+yargs.option('context', {
+	type: 'string',
+	description: 'Name the context for this api.',
+	default: 'context'
+});
+
 yargs
 	.help()
 	.check(check, true)
@@ -89,24 +95,27 @@ yargs
 try {
 	const cache = process.argv.indexOf('--cache') > 0;
 	const {rc} = loadRc();
-	const {access_token} = loadToken();
+	const token = loadToken();
+	const {access_token} = token;
 
 	const updateSchema = !(cache && fs.existsSync(home.schemaPath));
 	const schema = updateSchema ? rc.schema : home.schemaPath;
 	const parser = new SwaggerParser();
 
 	parser.validate(schema, {}, (err, api) => {
-		if (updateSchema) {
-			fs.writeFileSync(home.schemaPath, JSON.stringify(api));
-		}
+		if (api && api.paths) {
+			if (updateSchema) {
+				fs.writeFileSync(home.schemaPath, JSON.stringify(api));
+			}
 
-		const methods = swagger.get_methods(api);
-		methods.forEach(path => {
-			const _method = swagger.get_method(api, path);
-			const command = swagger.method_to_command(path, _method);
-			const {title, definition, cmd, method} = command;
-			yargs.command(cmd, title, definition, proxy.handler(access_token, rc, method, command));
-		});
+			const methods = swagger.get_methods(api);
+			methods.forEach(path => {
+				const _method = swagger.get_method(api, path);
+				const command = swagger.method_to_command(path, _method);
+				const {title, definition, cmd, method} = command;
+				yargs.command(cmd, title, definition, proxy.handler(access_token, rc, method, command));
+			});
+		}
 
 		yargs.argv;
 	});

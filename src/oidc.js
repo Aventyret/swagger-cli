@@ -118,9 +118,6 @@ const login = argv =>
 				reject(error);
 			});
 	})
-		.then(token => {
-			console.log(token);
-		})
 		.catch(error => {
 			console.error(error);
 		});

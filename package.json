@@ -1,16 +1,16 @@
 {
-	"name": "saapi",
-	"version": "0.0.0",
+	"name": "@aventyret/swagger-cli",
+	"version": "1.0.0",
 	"description": "My awesome command-line tool",
 	"license": "MIT",
-	"repository": "Aventyret/saapi",
+	"repository": "Aventyret/swagger-cli",
 	"author": {
 		"name": "Ivar Bergman",
 		"email": "ivar.bergman@aventyret.com",
-		"url": "http://github.com/Aventyret/saapi"
+		"url": "http://github.com/Aventyret/swagger-cli"
 	},
 	"bin": {
-		"saapi": "cli.js"
+		"swagger-cli": "cli.js"
 	},
 	"engines": {
 		"node": ">=12"

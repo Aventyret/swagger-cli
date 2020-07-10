@@ -7,7 +7,7 @@
 ## Install
 
 ```
-$ npm install --global swagger-cli
+$ npm install --global @aventyret/swagger-cli
 ```
 
 

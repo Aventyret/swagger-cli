@@ -1,7 +1,7 @@
-import test from 'ava';
-import execa from 'execa';
+const test = require('ava');
+const execa = require('execa');
 
 test('main', async t => {
-	const {stdout} = await execa('./cli.js', ['ponies']);
-	t.is(stdout, 'ponies & rainbows');
+	const {stdout} = await execa('./cli.js', ['help']);
+	t.truthy(stdout.includes('Commands'));
 });

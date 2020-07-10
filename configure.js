@@ -1,10 +1,13 @@
+/* eslint camelcase: "off"
+*/
+
 const prompt = require('prompt');
 const fs = require('fs');
 const home = require('./home');
 
 const configure = argv => {
 	console.log('Configure api cli:');
-	const {api, schema, provider, clientId, scope} = argv.rc || {};
+	const {api, schema, provider, client_id, scope} = argv.rc || {};
 	const properties = [
 		{
 			description: 'Api, base url ',
@@ -22,9 +25,9 @@ const configure = argv => {
 			default: provider
 		},
 		{
-			description: 'OpenID Connect, clientId ',
-			name: 'clientId',
-			default: clientId
+			description: 'OpenID Connect, client_id ',
+			name: 'client_id',
+			default: client_id
 		},
 		{
 			description: 'OpenID Connect, scope ',

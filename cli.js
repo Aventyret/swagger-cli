@@ -1,5 +1,11 @@
 #!/usr/bin/env node
-
+/* 	eslint unicorn/no-reduce: "off",
+	promise/prefer-await-to-then: "off",
+	prefer-promise-reject-errors: "off",
+	promise/no-return-wrap: "off",
+	no-unused-expressions: "off",
+	camelcase: "off"
+*/
 const fs = require('fs');
 const yargs = require('yargs');
 const SwaggerParser = require('@apidevtools/swagger-parser');
@@ -11,26 +17,24 @@ const oidc = require('./oidc');
 const configure = require('./configure');
 
 const check = () => {
-
 	if (!fs.existsSync(home.rcPath)) {
-		throw new Error('No configuration found. Run configure to create a configuration.')
+		throw new Error('No configuration found. Run configure to create a configuration.');
 	}
 
 	return true;
 };
 
 const loadToken = () => {
-	let token = {};
 	try {
 		if (fs.existsSync(home.tokenPath)) {
 			const tokenJson = fs.readFileSync(home.tokenPath, 'utf8');
-			token = JSON.parse(tokenJson);
+			return JSON.parse(tokenJson);
 		}
 	} catch (error) {
 		console.error(error);
 	}
 
-	return token || {};
+	return {};
 };
 
 const loadRc = () => {
@@ -57,7 +61,7 @@ const login = argv => {
 
 const token = argv => {
 	login(argv)
-		.then( token => {
+		.then(token => {
 			console.log(token);
 		});
 };
@@ -85,7 +89,7 @@ yargs
 try {
 	const cache = process.argv.indexOf('--cache') > 0;
 	const {rc} = loadRc();
-	const {accessToken} = loadToken();
+	const {access_token} = loadToken();
 
 	const updateSchema = !(cache && fs.existsSync(home.schemaPath));
 	const schema = updateSchema ? rc.schema : home.schemaPath;
@@ -101,11 +105,10 @@ try {
 			const _method = swagger.get_method(api, path);
 			const command = swagger.method_to_command(path, _method);
 			const {title, definition, cmd, method} = command;
-			yargs.command(cmd, title, definition, proxy.handler(accessToken, rc, method, command));
-
+			yargs.command(cmd, title, definition, proxy.handler(access_token, rc, method, command));
 		});
 
-		yargs.argv();
+		yargs.argv;
 	});
 } catch (error) {
 	console.error('Onoes! The API is invalid. ' + error.message);

@@ -1,113 +1,124 @@
-require('dotenv').config()
+/* 	eslint unicorn/no-reduce: "off",
+	promise/prefer-await-to-then: "off",
+	prefer-promise-reject-errors: "off",
+	promise/no-return-wrap: "off",
+	camelcase: "off"
+*/
+require('dotenv').config();
 const fetch = require('node-fetch');
-const { URL, URLSearchParams } = require('url');
 
-const handler = (token, rc, method, command) => (params) => {
+const handler = (token, rc, method, command) => parameters => {
+	const {definition, cmd} = command;
+	parameters = Object.keys(definition).reduce((previous, curr) => {
+		previous[curr] = parameters[curr];
+		return previous;
+	}, {});
 
-    const { title, definition, cmd } = command
-    const cmd_params = Object.keys(definition)
-    params = cmd_params.reduce( (prev, curr) => {
-        prev[curr] = params[curr]
-        return prev
-    }, {})
+	const headers = () => ({
+		'Content-Type': 'application/json',
+		Authorization: `Bearer ${token}`
+	});
 
-    const headers = () => ({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-    })
+	const post = (uri, data) => {
+		return fetch(`${rc.api}${uri}`, {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: headers()
+		})
+			.then(response => {
+				if (!response.ok) {
+					console.log(response.status);
+					console.log(`${rc.api}${uri}`, data);
+					if (response.status === 401) {
+						return response.text().then(() => Promise.reject({status: response.status, message: 'Unauthorized'}));
+					}
 
-    const post = (uri, data) => {
-        return fetch(`${rc.api}${uri}`, {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: headers()
-        })
-        .then(res => {
-            if (!res.ok) {
-                console.log(res.status)
-                console.log(`${rc.api}${uri}`, data)
-                if (res.status === 401) {
-                    return res.text().then( (message) => Promise.reject({status: res.status, message: 'Unauthorized'}))                
-                }
-                const errors = JSON.parse(res.message) || res.message
-                return res.text().then( (message) => Promise.reject({status: res.status, ...errors }))                                          
-            } 
-            return Promise.resolve(res.json());
-        }) 
-    }
+					const errors = JSON.parse(response.message) || response.message;
+					return response.text().then(() => Promise.reject({status: response.status, ...errors}));
+				}
 
-    const put = (uri, data) => {
-        return fetch(`${rc.api}${uri}`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-            headers: headers()
-        })
-        .then(res => {
-            if (!res.ok) {
-                console.log(res.status)
-                console.log(uri, data)
-                if (res.status === 401) {
-                    return res.text().then( (message) => Promise.reject({status: res.status, message: 'Unauthorized'}))                
-                }
-                const errors = JSON.parse(res.message) || res.message
-                return res.text().then( (message) => Promise.reject({status: res.status, ...errors }))                                          
-            } 
-            return Promise.resolve(res.json());
-        }) 
-    }
+				return Promise.resolve(response.json());
+			});
+	};
 
-    const get = (uri, params =  {}) => {
-        var url = new URL(`${rc.api}${uri}`)
-        url.search = new URLSearchParams(params).toString();
-        const h = {
-            method: 'GET',
-            headers: headers()
-        }
-        return fetch(url, h)
-        .then(res => {
-            if (!res.ok) {
-                console.log(res.status)
-                console.log(uri, params)
-                if (res.status === 401) {
-                    return res.text().then( (message) => Promise.reject({status: res.status, message: 'Unauthorized'}))                
-                }
-                return res.text().then( (message) => Promise.reject({status: res.status, message}))                
-            } 
-            return Promise.resolve(res.json());
-        })
-    }
+	const put = (uri, data) => {
+		return fetch(`${rc.api}${uri}`, {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			headers: headers()
+		})
+			.then(response => {
+				if (!response.ok) {
+					console.log(response.status);
+					console.log(uri, data);
+					if (response.status === 401) {
+						return response.text().then(() => Promise.reject({status: response.status, message: 'Unauthorized'}));
+					}
 
-    switch (method) {
-        case 'get':
-            get(cmd, params)
-            .then(res => {
-                console.log(JSON.stringify(res, null, 4))
-            })
-            .catch(err => {
-                console.log(JSON.stringify(err, null, 4))
-            })
-        break
-        case 'post':
-            post(cmd, params)
-            .then(res => {
-                console.log(JSON.stringify(res, null, 4))
-            })
-            .catch(err => {
-                console.log(JSON.stringify(err, null, 4))
-            })
-        break
-        case 'put':
-            put(cmd, params)
-            .then(res => {
-                console.log(JSON.stringify(res, null, 4))
-            })
-            .catch(err => {
-                console.log(JSON.stringify(err, null, 4))
-            })
-        break
-    }
-}
+					const errors = JSON.parse(response.message) || response.message;
+					return response.text().then(() => Promise.reject({status: response.status, ...errors}));
+				}
+
+				return Promise.resolve(response.json());
+			});
+	};
+
+	const get = (uri, parameters = {}) => {
+		const url = new URL(`${rc.api}${uri}`);
+		url.search = new URLSearchParams(parameters).toString();
+		const h = {
+			method: 'GET',
+			headers: headers()
+		};
+		return fetch(url, h)
+			.then(response => {
+				if (!response.ok) {
+					console.log(response.status);
+					console.log(uri, parameters);
+					if (response.status === 401) {
+						return response.text().then(() => Promise.reject({status: response.status, message: 'Unauthorized'}));
+					}
+
+					return response.text().then(message => Promise.reject({status: response.status, message}));
+				}
+
+				return Promise.resolve(response.json());
+			});
+	};
+
+	switch (method) {
+		case 'get':
+			get(cmd, parameters)
+				.then(response => {
+					console.log(JSON.stringify(response, null, 4));
+				})
+				.catch(error => {
+					console.log(JSON.stringify(error, null, 4));
+				});
+			break;
+		case 'post':
+			post(cmd, parameters)
+				.then(response => {
+					console.log(JSON.stringify(response, null, 4));
+				})
+				.catch(error => {
+					console.log(JSON.stringify(error, null, 4));
+				});
+			break;
+		case 'put':
+			put(cmd, parameters)
+				.then(response => {
+					console.log(JSON.stringify(response, null, 4));
+				})
+				.catch(error => {
+					console.log(JSON.stringify(error, null, 4));
+				});
+			break;
+		default:
+			break;
+	}
+};
 
 module.exports = {
-    handler
-} 
+	handler
+};

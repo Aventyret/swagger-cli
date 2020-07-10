@@ -1,30 +1,26 @@
 
-# unicorn-fun-cli [![Build Status](https://travis-ci.org/YOUR-GITHUB-USERNAME/unicorn-fun-cli.svg?branch=master)](https://travis-ci.org/YOUR-GITHUB-USERNAME/unicorn-fun-cli)
+# swagger-cli [![Build Status](https://travis-ci.org/ivarbergman/swagger-cli.svg?branch=master)](https://travis-ci.org/ivarbergman/swagger-cli)
 
-> My awesome command-line tool
+> An cli to perform calls on a swagger defined api.
 
 
 ## Install
 
 ```
-$ npm install --global unicorn-fun-cli
+$ npm install --global swagger-cli
 ```
 
 
 ## Usage
 
 ```
-$ unicorn-fun --help
+$ swagger-cli [command]
 
-  Usage
-    $ unicorn-fun [input]
+Commands:
+Options:
+  --version   Show version number                                      [boolean]
+  --cache     Cache swagger json                                       [boolean]
+  --verbose   Enable verbose output                                    [boolean]
+  --help, -h  Show help                                                [boolean]
 
-  Options
-    --postfix  Lorem ipsum  [Default: rainbows]
-
-  Examples
-    $ cli-name
-    unicorns & rainbows
-    $ cli-name ponies
-    ponies & rainbows
 ```

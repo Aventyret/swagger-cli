@@ -19,7 +19,7 @@
 		"test": "xo && ava"
 	},
 	"files": [
-		"src/cli.js"
+		"src/*.js"
 	],
 	"keywords": [
 		"cli",

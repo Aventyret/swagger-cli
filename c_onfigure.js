@@ -6,8 +6,13 @@ const {nsGet, nsSet} = require('./rc')();
 const configure = () => {
 	console.log('Configure api cli 2:');
 	console.log(nsGet('rc'));
-	const {schema, provider, client_id, scope} = nsGet('rc', {});
+	const {api, schema, provider, client_id, scope} = nsGet('rc', {});
 	const properties = [
+		{
+			description: 'Api, base url ',
+			name: 'api',
+			default: api
+		},
 		{
 			description: 'Swagger, schema url ',
 			name: 'schema',

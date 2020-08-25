@@ -90,17 +90,17 @@ const authDonePromise = () => new Promise(resolve => {
 	});
 });
 
-const login = argv =>
+const login = rc =>
 	new Promise((resolve, reject) => {
-		if (!argv) {
-			return reject('No arg');
-		}
-
-		if (!argv.rc) {
+		if (!rc) {
 			return reject('No rc arg');
 		}
 
-		const {provider, client_id, scope} = argv.rc;
+		if (!rc.provider) {
+			return reject('No rc provider');
+		}
+
+		const {provider, client_id, scope} = rc;
 
 		discoverPromise({provider, client_id, scope})
 			.then(Client => {

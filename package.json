@@ -28,6 +28,7 @@
 		"swagger"
 	],
 	"dependencies": {
+		"commander": "^6.0.0",
 		"dotenv": "^8.2.0",
 		"get-port": "^5.1.1",
 		"http-terminator": "^2.0.3",
@@ -35,6 +36,7 @@
 		"open": "^7.0.4",
 		"openid-client": "^3.15.3",
 		"prompt": "^1.0.0",
+		"ramda": "^0.27.0",
 		"swagger-parser": "^9.0.1",
 		"yargs": "^15.3.1"
 	},
@@ -49,6 +51,11 @@
 		"promise": {
 			"prefer-await-to-then": false
 		}
+	},
+	"ava": {
+		"files": [
+			"./tests/*.js"
+		]
 	},
 	"publishConfig": {
 		"access": "public"

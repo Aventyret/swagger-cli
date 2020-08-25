@@ -6,119 +6,61 @@
 	no-unused-expressions: "off",
 	camelcase: "off"
 */
-const fs = require('fs');
-const yargs = require('yargs');
-const SwaggerParser = require('@apidevtools/swagger-parser');
-
-const home = require('./home');
-const swagger = require('./swagger');
-const proxy = require('./proxy');
-const oidc = require('./oidc');
+const {Command} = require('commander');
+const swaggr = require('./swaggr');
 const configure = require('./configure');
+const login = require('./login');
+const {nsGet} = require('./rc')();
+const program = new Command();
+program.version('0.0.1');
 
-const check = () => {
-	if (!fs.existsSync(home.rcPath)) {
-		throw new Error('No configuration found. Run configure to create a configuration.');
-	}
-
-	return true;
-};
-
-const loadToken = () => {
-	try {
-		if (fs.existsSync(home.tokenPath)) {
-			const tokenJson = fs.readFileSync(home.tokenPath, 'utf8');
-			return JSON.parse(tokenJson);
-		}
-	} catch (error) {
-		console.error(error);
-	}
-
-	return {};
-};
-
-const loadRc = () => {
-	try {
-		const rcJson = fs.readFileSync(home.rcPath, 'utf8');
-		const rc = JSON.parse(rcJson);
-		return {rc, ...home};
-	} catch (error) {
-		console.error(error);
-	}
-
-	return {};
-};
-
-const login = argv => {
-	return oidc(argv)
-		.then(token => {
-			if (typeof token !== 'undefined') {
-				fs.writeFileSync(home.tokenPath, JSON.stringify(token));
-				return token;
-			}
-		});
-};
-
-const token = argv => {
-	login(argv)
-		.then(token => {
-			console.info(token);
-		});
-};
-
-yargs.middleware(loadRc);
-yargs.command('configure', 'configure', {}, configure);
-yargs.command('login', 'login', {}, login);
-yargs.command('token', 'token', {}, token);
-
-yargs.option('cache', {
-	type: 'boolean',
-	description: 'Cache swagger json'
-});
-
-yargs.option('verbose', {
-	type: 'boolean',
-	description: 'Enable verbose output'
-});
-
-yargs.option('context', {
-	type: 'string',
-	description: 'Name the context for this api.',
-	default: 'context'
-});
-
-yargs
-	.help()
-	.check(check, true)
-	.alias('help', 'h');
-
-try {
-	const cache = process.argv.indexOf('--cache') > 0;
-	const {rc} = loadRc();
-	const token = loadToken();
-	const {access_token} = token;
-
-	const updateSchema = !(cache && fs.existsSync(home.schemaPath));
-	const schema = updateSchema ? rc.schema : home.schemaPath;
-	const parser = new SwaggerParser();
-
-	parser.validate(schema, {}, (err, api) => {
-		if (api && api.paths) {
-			if (updateSchema) {
-				fs.writeFileSync(home.schemaPath, JSON.stringify(api));
-			}
-
-			const methods = swagger.get_methods(api);
-			methods.forEach(path => {
-				const _method = swagger.get_method(api, path);
-				const command = swagger.method_to_command(path, _method);
-				const {title, definition, cmd, method} = command;
-				yargs.command(cmd, title, definition, proxy.handler(access_token, rc, method, command));
-			});
-		}
-
-		yargs.argv;
-	});
-} catch (error) {
-	console.error('Onoes! The API is invalid. ' + error.message);
+const major = Number.parseInt(process.versions.node.split('.')[0], 10);
+if (major < 12) {
+	console.log('Node > 12 required');
+	process.exit(1);
 }
+
+(async () => {
+	program
+		.option('-v, --verbose', 'output extra debugging');
+
+	program
+		.command('login')
+		.action(login);
+
+	program
+		.command('configure')
+		.action(configure);
+
+	const {schema} = nsGet('rc');
+	if (schema) {
+		const sw = await swaggr(schema);
+
+		program
+			.command('get <path>')
+			.allowUnknownOption()
+			.action(sw.request('get'));
+
+		program
+			.command('post <path>')
+			.allowUnknownOption()
+			.action(sw.request('post'));
+
+		program
+			.command('put <path>')
+			.allowUnknownOption()
+			.action(sw.request('put'));
+
+		program
+			.command('delete <path>')
+			.allowUnknownOption()
+			.action(sw.request('delete'));
+
+		program
+			.command('schema [method] [path]')
+			.action(sw.info);
+	}
+
+	program.parse(process.argv);
+})();
+

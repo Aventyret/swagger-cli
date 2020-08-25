@@ -2,18 +2,12 @@
 */
 
 const prompt = require('prompt');
-const fs = require('fs');
-const home = require('./home');
-
-const configure = argv => {
-	console.log('Configure api cli:');
-	const {api, schema, provider, client_id, scope} = argv.rc || {};
+const {nsGet, nsSet} = require('./rc')();
+const configure = () => {
+	console.log('Configure api cli 2:');
+	console.log(nsGet('rc'));
+	const {schema, provider, client_id, scope} = nsGet('rc', {});
 	const properties = [
-		{
-			description: 'Api, base url ',
-			name: 'api',
-			default: api
-		},
 		{
 			description: 'Swagger, schema url ',
 			name: 'schema',
@@ -46,7 +40,7 @@ const configure = argv => {
 				return 1;
 			}
 
-			fs.writeFileSync(home.rcPath, JSON.stringify(result));
+			nsSet('rc', result);
 		});
 };
 

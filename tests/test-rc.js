@@ -6,11 +6,6 @@ const rcMod = require('../src/rc');
 
 const {nsGet, nsSet, use, all, get, set} = rcMod(null, '/tmp/swagger-cli-test');
 
-test('main', async t => {
-	const {stdout} = await execa('./src/cli.js', ['help']);
-	t.truthy(stdout.includes('Commands'));
-});
-
 test('Get ns from rc', t => {
 	const ns = get('ns');
 	t.is(ns, 'default');

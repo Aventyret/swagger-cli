@@ -13,6 +13,13 @@ const login = require('./login');
 const {nsGet} = require('./rc')();
 const program = new Command();
 program.version('0.0.1');
+
+const major = Number.parseInt(process.versions.node.split('.')[0], 10);
+if (major < 12) {
+	console.log('Node > 12 required');
+	process.exit(1);
+}
+
 (async () => {
 	program
 		.option('-v, --verbose', 'output extra debugging');

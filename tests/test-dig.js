@@ -76,12 +76,12 @@ const value = {
 };
 
 const api = {
-	'get': {
+	get: {
 		'/path': {
 			i: 'p'
 		}
 	},
-	'post': {
+	post: {
 		'/path': {
 			i: 'p'
 		}
@@ -239,7 +239,6 @@ test('dig 17', t => {
 	const value = {a: {foo: 1}, b: {foo: 2}, c: {foo: 3}};
 	t.deepEqual(dig(value, [], 'foo'), [1, 2, 3]);
 });
-
 
 test('dig 19', t => {
 	const value = [{a: 1, b: 2}, {a: 3, b: 4}, {a: 5, b: 6}];

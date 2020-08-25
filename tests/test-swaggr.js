@@ -8,7 +8,7 @@ test.before(async t => {
 	t.context = sw;
 });
 
-test('petstore.swagger',  t => {
+test('petstore.swagger', t => {
 	const sw = t.context;
 	t.is(sw.valid, true);
 });
@@ -18,7 +18,7 @@ test('base', t => {
 	t.is(sw.base(), 'http://localhost:5000/api/');
 });
 
-test('prognoswebben.swagger',  t => {
+test('prognoswebben.swagger', t => {
 	const sw = t.context;
 	t.is(sw.valid, true);
 });
@@ -28,7 +28,7 @@ test('1', t => {
 	const paths = sw.paths();
 	t.deepEqual(paths[0], {
 		method: 'get',
-		path: '/api/region/list'
+		path: '/api/error/development'
 	});
 });
 
@@ -36,52 +36,52 @@ test('2', t => {
 	const sw = t.context;
 	const parameters = sw.parameters('get', '/api/region/get');
 	t.deepEqual(parameters, [{
-		format: 'uuid',
+		format: 'int32',
 		in: 'query',
 		name: 'id',
-		type: 'string'
+		type: 'integer'
 	}]);
 });
 
-test('3', t => {
+test('3', async t => {
 	const sw = t.context;
-	const body = sw.requestBody('post', '/api/forecast/add');
+	const body = await sw.requestBody('post', '/api/forecast/add');
 	t.deepEqual(body, [
 		{
 			name: 'name',
 			in: 'body',
-			nullable: true,
 			type: 'string'
 		},
 		{
 			name: 'method',
 			in: 'body',
+			type: 'string'
+		},
+		{
+			format: 'date-time',
+			name: 'periodStartDate',
+			in: 'body',
+			type: 'string'
+		},
+		{
+			format: 'date-time',
+			name: 'periodEndDate',
+			in: 'body',
+			type: 'string'
+		},
+		{
+			format: 'date-time',
+			name: 'deadlineDate',
+			in: 'body',
 			nullable: true,
 			type: 'string'
 		},
 		{
-			format: 'date-time',
-			name: 'periodStartAt',
-			in: 'body',
-			type: 'string'
-		},
-		{
-			format: 'date-time',
-			name: 'periodEndAt',
-			in: 'body',
-			type: 'string'
-		},
-		{
-			format: 'date-time',
-			name: 'deadlineAt',
-			in: 'body',
-			type: 'string'
-		},
-		{
-			format: 'uuid',
+			format: 'int32',
 			name: 'referenceForecastId',
+			nullable: true,
 			in: 'body',
-			type: 'string'
+			type: 'integer'
 		}
 	]);
 });
@@ -101,6 +101,12 @@ test('5', t => {
 			in: 'body',
 			nullable: true,
 			type: 'string'
+		},
+		{
+			format: 'int32',
+			in: 'body',
+			name: 'id',
+			type: 'integer'
 		}
 	]);
 });

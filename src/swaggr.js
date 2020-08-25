@@ -8,6 +8,7 @@ const SwaggerParser = require('@apidevtools/swagger-parser');
 const dig = require('./dig');
 const {nsGet} = require('./rc')();
 const client = require('./client');
+const {argsToArray} = require('../src/utils');
 
 const request = sw => method => (path, _, args = []) => {
 	const parameters = sw.args(method, path);
@@ -15,44 +16,40 @@ const request = sw => method => (path, _, args = []) => {
 	parameters.forEach(p => {
 		pMap[p.name] = p;
 	});
-	let inBody = {};
-	let inQuery = {};
-	let inPath = {};
-	args.forEach((a, i) => {
-		if (a.startsWith('--')) {
-			const aa = a.slice(2);
-			if (aa === 'body') {
-				inBody = JSON.parse(args[i + 1]);
-			}
-
-			if (aa === 'query') {
-				inQuery = JSON.parse(args[i + 1]);
-			}
-
-			if (aa === 'path') {
-				inPath = JSON.parse(args[i + 1]);
-			}
-		} else if (a.startsWith('-')) {
-			const aa = a.slice(1);
-			const pa = pMap[aa];
+	const argsArray = argsToArray(args);
+	const inBody = {};
+	const inQuery = {};
+	const inPath = {};
+	for (const theArgs of argsArray) {
+		for (let [key, value] of Object.entries(theArgs)) {
+			const pa = pMap[key];
 			if (pa) {
+				if (pa.type === 'integer') {
+					value = Number.parseInt(value, 10);
+				}
+
+				if (pa.type === 'string') {
+					value = `${value}`;
+				}
+
 				if (pa.in === 'body') {
-					inBody[aa] = args[i + 1];
+					inBody[key] = value;
 				}
 
 				if (pa.in === 'query') {
-					inQuery[aa] = args[i + 1];
+					inQuery[key] = value;
 				}
 
 				if (pa.in === 'path') {
-					inPath[aa] = args[i + 1];
+					inPath[key] = value;
 				}
 			}
 		}
-	});
-	const {access_token} = nsGet('token');
-	const c = client(access_token, sw.base());
-	c.request(method, path, {inBody, inQuery, inPath});
+
+		const {access_token} = nsGet('token');
+		const c = client(access_token, sw.base());
+		c.request(method, path, {inBody, inQuery, inPath});
+	}
 };
 
 const info = sw => (method, path) => {
@@ -66,9 +63,10 @@ const info = sw => (method, path) => {
 	}
 
 	paths.forEach(({path, method}) => {
-		console.log(`${method} ${path}`);
 		const parameters = sw.args(method, path);
-		console.log(parameters);
+		const parameters_info = parameters.map(m => m.name).join(',');
+		console.log(`${method} ${path} ${parameters_info}`);
+		console.log(JSON.stringify(parameters));
 	});
 };
 

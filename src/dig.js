@@ -1,8 +1,11 @@
-const { exit } = require("yargs");
-
-/* eslint unicorn/no-reduce: "off"
+/* 	eslint unicorn/no-reduce: "off",
+	promise/prefer-await-to-then: "off",
+	prefer-promise-reject-errors: "off",
+	promise/no-return-wrap: "off",
+	camelcase: "off",
+	unicorn/no-fn-reference-in-iterator: "off"
 */
-const isNull = value => value ===  null;
+const isNull = value => value === null;
 const isUndefined = value => typeof value === 'undefined';
 const isObject = object => typeof object === 'function' || (typeof object === 'object' && !isArray(object) && Boolean(object));
 const isFunction = key => typeof key === 'function';
@@ -11,7 +14,6 @@ const isArrayNonEmpty = arrary => Array.isArray(arrary) && arrary.length > 0;
 const isNegative = key => Number.isInteger(key) && key < 0;
 const isInteger = key => Number.isInteger(key);
 const isScalar = value => typeof value === 'string' || typeof value === 'number';
-const isProperty = value => typeof value === 'string';
 const isIndexArray = args => Array.isArray(args) && args.filter && args.length && args.filter(isInteger).length === args.length;
 const isKeyArray = (...args) => Array.isArray(...args) && args.filter && args.filter(isInteger).length === 0;
 const filterProps = (object, properties) => properties.reduce((p, c) => {
